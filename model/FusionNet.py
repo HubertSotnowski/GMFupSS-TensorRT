@@ -1,7 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .forward_warp2 import ForwardWarp as warp
+
+from .forward_warp2 import ForwardWarp 
 
 # Residual Block
 def ResidualBlock(in_channels, out_channels, stride=1):
@@ -228,44 +229,60 @@ class AnimeInterp(nn.Module):
         super(AnimeInterp, self).__init__()
         self.feat_ext = FeatureExtractor()
         self.synnet = GridNet(6, 64, 128, 96 * 2, 3)
+        self.warp=ForwardWarp()
 
     def dflow(self, flo, target):
         tmp = F.interpolate(flo, target.size()[2:4])
         tmp[:, :1] = tmp[:, :1].clone() * tmp.size()[3] / flo.size()[3]
         tmp[:, 1:] = tmp[:, 1:].clone() * tmp.size()[2] / flo.size()[2]
+
         return tmp
+
     def dmetric(self, metric, target):
-        print(metric)
         tmp = F.interpolate(metric, target.size()[2:4])
+
         return tmp
-    def forward(self, imgs, I1, I2, F1t, F2t, Z1, Z2):
-        feat11, feat12, feat13 = self.feat_ext(imgs[:, :3])
-        feat21, feat22, feat23 = self.feat_ext(imgs[:, 3:6])
 
-        I1t = warp(I1, F1t, Z1)
-        I2t = warp(I2, F2t, Z2)
+    def forward(self, I1, I2, reuse_things, t):
+        F12, Z1, feat11, feat12, feat13 = (
+            reuse_things[0],
+            reuse_things[2],
+            reuse_things[4][0],
+            reuse_things[4][1],
+            reuse_things[4][2],
+        )
+        F21, Z2, feat21, feat22, feat23 = (
+            reuse_things[1],
+            reuse_things[3],
+            reuse_things[5][0],
+            reuse_things[5][1],
+            reuse_things[5][2],
+        )
 
-        F1td = self.dflow(F1t, feat11)
-        F2td = self.dflow(F2t, feat21)
-        Z1d = self.dmetric(Z1, feat11)
-        Z2d = self.dmetric(Z2, feat21)
-        feat1t1 = warp(feat11, F1td, Z1d)
-        feat2t1 = warp(feat21, F2td, Z2d)
+        F1t = t * F12
+        F2t = (1 - t) * F21
+
+        I1 = F.interpolate(I1, scale_factor=0.5, mode="bilinear", align_corners=False)
+        I1t = self.warp(I1, F1t, Z1)
+        I2 = F.interpolate(I2, scale_factor=0.5, mode="bilinear", align_corners=False)
+        I2t = self.warp(I2, F2t, Z2)
+
+        feat1t1 = self.warp(feat11, F1t, Z1)
+        feat2t1 = self.warp(feat21, F2t, Z2)
 
         F1tdd = self.dflow(F1t, feat12)
         F2tdd = self.dflow(F2t, feat22)
-        Z1dd =  F.interpolate(Z1, feat12.size()[2:4])
+        Z1dd = self.dmetric(Z1, feat12)
         Z2dd = self.dmetric(Z2, feat22)
-
-        feat1t2 = warp(feat12, F1tdd, Z1dd)
-        feat2t2 = warp(feat22, F2tdd, Z2dd)
+        feat1t2 = self.warp(feat12, F1tdd, Z1dd)
+        feat2t2 = self.warp(feat22, F2tdd, Z2dd)
 
         F1tddd = self.dflow(F1t, feat13)
         F2tddd = self.dflow(F2t, feat23)
         Z1ddd = self.dmetric(Z1, feat13)
         Z2ddd = self.dmetric(Z2, feat23)
-        feat1t3 = warp(feat13, F1tddd, Z1ddd)
-        feat2t3 = warp(feat23, F2tddd, Z2ddd)
+        feat1t3 = self.warp(feat13, F1tddd, Z1ddd)
+        feat2t3 = self.warp(feat23, F2tddd, Z2ddd)
 
         It_warp = self.synnet(
             torch.cat([I1t, I2t], dim=1),
