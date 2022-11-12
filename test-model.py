@@ -7,7 +7,7 @@ from PIL import Image
 model = Model()
 
 img1 = Image.open("demo/stacked.jpg")
-img1 = img1.resize((512,512))
+img1 = img1.resize((128,128))
 convert_tensor = transforms.ToTensor()
 import cv2
 img1=convert_tensor(img1).unsqueeze(dim=0)

@@ -6,8 +6,8 @@ model = Model()
 
 input_names = ["x.1", ]
 output_names = ["output_frame"]
-f1 = torch.rand((1, 3, 512, 512))
-f2 = torch.rand((1, 3, 512, 512))
+f1 = torch.rand((1, 3, 256, 448*2))
+f2 = torch.rand((1, 3, 256, 448*2))
 x = (f1)
 torch.onnx.export(model,               # model being run
                   x,                         # model input (or a tuple for multiple inputs)
