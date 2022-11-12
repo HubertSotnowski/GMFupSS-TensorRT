@@ -125,38 +125,16 @@ def sample_one(img, shiftx, shifty, weight):
     # (zero part - gt) -> difference
     # difference back propagate -> No influence! Whether we do need mask? mask?
     # put (add) them together
-   # if use_gpu:
-       # img_warp = torch.zeros(
-       #     [
-      #          N * C * H * W,
-     #       ]
-    #    )
-   # else:
-       # img_warp = torch.zeros(
-       #     [
-       #         N * C * H * W,
-      #      ]
-     #   )
-  # # img_warp.put_(
-   #     ids_mask, torch.masked_select(flat_img * flat_weight, mask), accumulate=True
-   # )
+    if use_gpu:
+        img_warp = torch.zeros([N*C*H*W, ])  
+        img_warp = torch.zeros([N*C*H*W, ])
+    img_warp.put_(ids_mask, torch.masked_select(flat_img*flat_weight, mask), accumulate=True)
+    if use_gpu:
+        one_warp = torch.zeros([N*C*H*W, ]) 
+    else:
+        one_warp = torch.zeros([N*C*H*W, ])
+    one_warp.put_(ids_mask, torch.masked_select(flat_weight, mask), accumulate=True)
 
-   # if use_gpu:
-   #     one_warp = torch.zeros(
-           
-           # [
-           #     N * C * H * W,
-          #  ]
-   #     )
-    #else:
-     #   one_warp = torch.zeros(
-      #      [
-       #         N * C * H * W,
-        #    ]
-        #)
-#    one_warp.put_(ids_mask, torch.masked_select(flat_weight, mask), accumulate=True)
-
-    # calculate zero mask
 
     return flat_img.view(N, C, H, W), flat_img.view(N, C, H, W)
 
