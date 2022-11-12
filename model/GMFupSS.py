@@ -33,6 +33,7 @@ class Model(nn.Module):
             self.fusionnet.load_state_dict(convert(torch.load('{}/fusionnet.pkl'.format(path))))
 
     def forward(self, x2):
+        x2=x2/2
         img1,img0=torch.split(x2,int(x2.shape[3]/2),dim=3)
         scale=1.0
         timestep=0.5
@@ -59,6 +60,27 @@ class Model(nn.Module):
         F0t = timestep * flow01
         F1t = (1 - timestep) * flow10
         out = self.fusionnet(imgs, img0, img1, F0t, F1t, metric0, metric1)
-        padding=torch.nn.ZeroPad2d([0,x2.shape[3]])
+        topad=int(x2.shape[3]/2)
+        padding=torch.nn.ZeroPad2d([0, topad])
         out=padding(out)
-        return out
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out.shape)
+        print(out)
+        return out*2

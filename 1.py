@@ -16,4 +16,4 @@ torch.onnx.export(model,               # model being run
                   opset_version=16,          # the ONNX version to export the model to
                   input_names = ['input'],   # the model's input names
                   output_names = ['output'],
-                  verbose=True)
+                  verbose=False)
