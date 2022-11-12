@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .forward_warp2 import ForwardWarp 
+from .forward_warp2 import ForwardWarp
 
 # Residual Block
 def ResidualBlock(in_channels, out_channels, stride=1):
@@ -229,7 +229,7 @@ class AnimeInterp(nn.Module):
         super(AnimeInterp, self).__init__()
         self.feat_ext = FeatureExtractor()
         self.synnet = GridNet(6, 64, 128, 96 * 2, 3)
-        self.warp=ForwardWarp()
+        self.warp = ForwardWarp()
 
     def dflow(self, flo, target):
         tmp = F.interpolate(flo, target.size()[2:4])

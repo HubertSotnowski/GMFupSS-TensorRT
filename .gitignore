@@ -130,3 +130,5 @@ dmypy.json
 *.lwi
 *.mp4
 *.mkv
+*.engine
+*.onnx
