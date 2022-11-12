@@ -1,3 +1,4 @@
 # GMFupSS TensorRt
-A faster [GMFSS](https://github.com/YiWeiHuang-stack/GMFSS)
-###Experimental verssion
+##Experimental verssion
+###A faster GMFSS
+
