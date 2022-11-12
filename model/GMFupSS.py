@@ -33,7 +33,7 @@ class Model(nn.Module):
             self.fusionnet.load_state_dict(convert(torch.load('{}/fusionnet.pkl'.format(path))))
 
     def forward(self, x2):
-        x2=x2/2
+        x2=x2/4
         img1,img0=torch.split(x2,int(x2.shape[3]/2),dim=3)
         scale=1.0
         timestep=0.5
@@ -83,4 +83,4 @@ class Model(nn.Module):
         print(out.shape)
         print(out.shape)
         print(out)
-        return out*2
+        return out
