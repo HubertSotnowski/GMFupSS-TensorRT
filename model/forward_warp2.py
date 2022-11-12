@@ -127,6 +127,7 @@ def sample_one(img, shiftx, shifty, weight):
     # put (add) them together
     if use_gpu:
         img_warp = torch.zeros([N*C*H*W, ])  
+    else:
         img_warp = torch.zeros([N*C*H*W, ])
     img_warp.put_(ids_mask, torch.masked_select(flat_img*flat_weight, mask), accumulate=True)
     if use_gpu:
