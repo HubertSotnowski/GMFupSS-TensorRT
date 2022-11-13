@@ -41,6 +41,28 @@ class Model(nn.Module):
 
     def forward(self, x2):
         img1, img0 = torch.split(x2, int(x2.shape[3] / 2), dim=3)
+        print(img1.shape)
+        height=img1.shape[2]
+        if img1.shape[3]%64==0:
+            pass
+        else:
+            #print(img1.shape)
+            paddingw=(64-img1.shape[3]%64)
+            respad=torch.nn.ZeroPad2d([0, paddingw])
+            img1=respad(img1)
+            img0=respad(img0)
+            #print(paddingw)
+            print(img1.shape)
+        if img1.shape[2]%64==0:
+            pass
+        else:
+            print()
+            paddingh=(64-img1.shape[2]%64)
+            respad=torch.nn.ZeroPad2d([0,0, 0,paddingh])
+            img1=respad(img1)
+            img0=respad(img0)
+            print(img1.shape)
+
         img1_ = img0
         img2_ = img1
         scale = 1
@@ -90,29 +112,9 @@ class Model(nn.Module):
 
         metric0, metric1 = self.metricnet(img0, img1, flow01, flow10)
         reuse_things = flow01, flow10, metric0, metric1, feat_ext0, feat_ext1
-        print(img1_.shape)
         out = self.fusionnet(img1_, img2_, reuse_things, 0.5)
         topad = int(x2.shape[3] / 2)
-        padding = torch.nn.ZeroPad2d([0, topad])
+        padding = torch.nn.ZeroPad2d([0, topad-(paddingw)])
         out = padding(out)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out.shape)
-        print(out)
-        return out
+        print(height)
+        return out[:,:,0:height]
