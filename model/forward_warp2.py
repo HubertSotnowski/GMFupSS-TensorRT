@@ -182,16 +182,6 @@ class ForwardWarp(nn.Module):
         # (zero part - gt) -> difference
         # difference back propagate -> No influence! Whether we do need mask? mask?
         # put (add) them together
-        img_warp = torch.zeros(
-            [
-                N * C * H * W,
-            ]
-        )
         img_warp = flat_img * flat_weight
-        one_warp = torch.zeros(
-            [
-                N * C * H * W,
-            ]
-        )
         one_warp = flat_weight
         return img_warp.view(N, C, H, W), one_warp.view(N, C, H, W)
