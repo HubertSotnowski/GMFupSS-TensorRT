@@ -43,6 +43,7 @@ class Model(nn.Module):
         img1, img0 = torch.split(x2, int(x2.shape[3] / 2), dim=3)
         print(img1.shape)
         height=img1.shape[2]
+        paddingw=0
         if img1.shape[3]%64==0:
             pass
         else:
