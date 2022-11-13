@@ -182,6 +182,27 @@ class ForwardWarp(nn.Module):
         # (zero part - gt) -> difference
         # difference back propagate -> No influence! Whether we do need mask? mask?
         # put (add) them together
-        img_warp = flat_img * flat_weight
-        one_warp = flat_weight
+		# put (add) them together
+        if use_gpu:
+            img_warp = torch.zeros([N*C*H*W, ]).cuda() 
+        else:
+            img_warp = torch.zeros([N*C*H*W, ])
+
+        at_idxs = ids_mask
+        replace_val = torch.masked_select(flat_img*flat_weight, mask)
+        print(".....")
+        print(img_warp.shape)
+        img_warp = img_warp.scatter_(0, at_idxs, replace_val)
+        print(img_warp.shape)
+        #img_warp.put_(ids_mask, torch.masked_select(flat_img*flat_weight, mask), accumulate=True)
+		
+        if use_gpu:
+            one_warp = torch.zeros([N*C*H*W, ]).cuda()
+        else:
+            one_warp = torch.zeros([N*C*H*W, ])
+
+        replace_val = torch.masked_select(flat_weight, mask)
+        one_warp = one_warp.scatter_(0, at_idxs, replace_val)
+        #one_warp.put_(ids_mask, torch.masked_select(flat_weight, mask), accumulate=True)
+        # calculate zero mask
         return img_warp.view(N, C, H, W), one_warp.view(N, C, H, W)

@@ -8,7 +8,7 @@ from PIL import Image
 model = Model()
 
 img1 = Image.open("demo/stacked.jpg")
-img1 = img1.resize((128, 128))
+img1 = img1.resize((1024, 512))
 convert_tensor = transforms.ToTensor()
 import cv2
 
